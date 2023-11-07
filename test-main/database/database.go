@@ -11,8 +11,8 @@ const (
 	host     = "localhost"
 	port     = 5432
 	user     = "postgres"
-	password = "1234"
-	dbname   = "testdb"
+	password = "123"
+	dbname   = "aylal"
 )
 
 var DBConn *sql.DB

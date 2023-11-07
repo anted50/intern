@@ -27,3 +27,20 @@ type LoginStatus struct {
 	Message  string `json:"message"`
 	Username string `json:"User"`
 }
+
+type Trip struct {
+	ID          int    `json:"id"`
+	Title       string `json:"Title"`
+	Desc        string `json:"Description"`
+	Url         string `json:"URL"`
+	Price       string `json:"Price"`
+	Capacity    int    `json:"Capacity"`
+	Type        string `json:"Type"`
+	HasCompFood bool   `json:"hasCompFood"`
+	Additional  string `json:"additional"`
+	ContactNo   string `json:"ContactNo"`
+}
+
+type Get struct {
+	ID int `json:"id"`
+}

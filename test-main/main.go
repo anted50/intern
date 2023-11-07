@@ -1,10 +1,8 @@
 package main
 
 import (
-	// "fmt"
-	// "os"
-	"testLogin/database"
-	"testLogin/models"
+	"test/database"
+	"test/models"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -29,11 +27,12 @@ func login(c *gin.Context) {
 	}
 	defer rows.Close()
 
+	var dbid int
 	var dbusername string
 	var dbpassword string
 
 	for rows.Next() {
-		err := rows.Scan(&dbusername, &dbpassword)
+		err := rows.Scan(&dbid, &dbusername, &dbpassword)
 		if err != nil {
 			panic(err)
 		}
@@ -97,6 +96,63 @@ func register(c *gin.Context) {
 	return
 }
 
+func get(c *gin.Context) {
+	var req models.Get
+	var response models.Trip
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(400, err.Error())
+		return
+	}
+
+	id := req.ID
+
+	sqlStatement := "SELECT * FROM trip WHERE id = $1"
+
+	db := database.DBConn
+	rows, err := db.Query(sqlStatement, id)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	var dbid int
+	var title string
+	var desc string
+	var url string
+	var price string
+	var Capacity int
+	var Type string
+	var hasCompFood bool
+	var additional string
+	var contactNo string
+
+	for rows.Next() {
+		err := rows.Scan(&dbid, &title, &desc, &url, &price, &Capacity, &Type, &hasCompFood, &additional, &contactNo)
+		if err != nil {
+			panic(err)
+		}
+		if dbid == id {
+			response.ID = dbid
+			response.Title = title
+			response.Desc = desc
+			response.Url = url
+			response.Price = price
+			response.Capacity = Capacity
+			response.Type = Type
+			response.HasCompFood = hasCompFood
+			response.Additional = additional
+			response.ContactNo = contactNo
+		}
+	}
+
+	err = rows.Err()
+	if err != nil {
+		panic(err)
+	}
+	c.JSON(200, response)
+	return
+}
+
 func main() {
 	err := database.InitDB()
 	if err != nil {
@@ -105,10 +161,11 @@ func main() {
 	router := gin.Default()
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3001"}
+	config.AllowOrigins = []string{"http://localhost:3000"}
 	router.Use(cors.New(config))
 
 	router.POST("/register", register)
+	router.POST("/get", get)
 	router.POST("/login", login)
 
 	router.Run(":5000")
